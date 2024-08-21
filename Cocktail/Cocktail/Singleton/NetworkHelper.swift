@@ -62,69 +62,75 @@ class FirebaseRecipe {
     
     let uid = Auth.auth().currentUser?.uid
     
-    func getRecommendations(completion: @escaping ([Recommendation]) -> (Void)) {
+    /// 추천 카테고리의 칵테일 리스트를 불러온다
+    func getRecommendations(completion: @escaping (Result<[Recommendation], ShakerError>) -> (Void)) {
         ref.child("CocktailRecommendation").observeSingleEvent(of: .value) { snapshot in
             guard let value = snapshot.value as? [[String: Any]],
                   let data = try? JSONSerialization.data(withJSONObject: value, options: []),
                   let cocktailList = try? JSONDecoder().decode([Recommendation].self, from: data) else {
-                      completion([Recommendation]())
-                      return }
-            completion(cocktailList)
+                completion(.failure(.decoding("추천목록을 받아오는데 오류가 발생했습니다")))
+                return }
+            completion(.success(cocktailList))
         }
     }
     
+    /// 추천 카테고리의 칵테일 리스트를 Single로 반환해준다
     func getRecommendationsRx() -> Single<[Recommendation]> {
         return Single.create {[weak self] observer in
             self?.ref.child("CocktailRecommendation").observeSingleEvent(of: .value) { snapshot in
                 guard let value = snapshot.value as? [[String: Any]],
                       let data = try? JSONSerialization.data(withJSONObject: value, options: []),
                       let cocktailList = try? JSONDecoder().decode([Recommendation].self, from: data) else {
-                          observer(.success([Recommendation]()))
-                          return }
+                    observer(.failure(ShakerError.decoding()))
+                    return }
                 observer(.success(cocktailList))
             }
             return Disposables.create()
         }
     }
     
+    /// 전체 레시피를 Single로 불러온다
     func getRecipeRx() -> Single<[Cocktail]> {
         return Single.create {[weak self] observer in
             self?.ref.child("CocktailRecipes").observeSingleEvent(of: .value) { snapshot in
                 guard let value = snapshot.value as? [[String: Any]],
                       let data = try? JSONSerialization.data(withJSONObject: value, options: []),
                       let cocktailList = try? JSONDecoder().decode([Cocktail].self, from: data) else {
-                          observer(.success([Cocktail]()))
-                          return }
+                    observer(.failure(ShakerError.decoding()))
+                    return }
                 observer(.success(cocktailList))
             }
             return Disposables.create()
         }
     }
     
-    func getRecipe(completion: @escaping ([Cocktail]) -> (Void)) {
+    /// 전체 레시피를 불러온다
+    func getRecipe(completion: @escaping (Result<[Cocktail], ShakerError>) -> (Void)) {
         ref.child("CocktailRecipes").observeSingleEvent(of: .value) { snapshot in
             guard let value = snapshot.value as? [[String: Any]],
                   let data = try? JSONSerialization.data(withJSONObject: value, options: []),
                   let cocktailList = try? JSONDecoder().decode([Cocktail].self, from: data) else {
-                      completion([Cocktail]())
-                      return }
-            completion(cocktailList)
+                completion(.failure(.encoding()))
+                return }
+            completion(.success(cocktailList))
         }
     }
     
-    func getMyRecipe(completion: @escaping ([Cocktail]) -> (Void)) {
+    /// 내가 직접 만든 레시피를 불러온다
+    func getMyRecipe(completion: @escaping (Result<[Cocktail], ShakerError>) -> (Void)) {
         guard let uid = uid else { return }
         ref.child("users").child(uid).child("MyRecipes").observeSingleEvent(of: .value) { snapshot in
             guard let value = snapshot.value as? [[String: Any]],
                   let data = try? JSONSerialization.data(withJSONObject: value, options: []),
                   let cocktailList = try? JSONDecoder().decode([Cocktail].self, from: data) else {
-                      completion([Cocktail]())
-                      return }
+                completion(.failure(.decoding()))
+                return }
             let myRecipes = cocktailList.filter { $0.myRecipe == true }
-            completion(myRecipes)
+            completion(.success(myRecipes))
         }
     }
     
+    /// 내가 직접 만든 레시피를 Single로 불러온다
     func getMyRecipeRx() -> Single<[Cocktail]> {
         return Single.create {[weak self] observer in
             guard let uid = self?.uid else { return Disposables.create() }
@@ -132,8 +138,8 @@ class FirebaseRecipe {
                 guard let value = snapshot.value as? [[String: Any]],
                       let data = try? JSONSerialization.data(withJSONObject: value, options: []),
                       let cocktailList = try? JSONDecoder().decode([Cocktail].self, from: data) else {
-                          observer(.success([Cocktail]()))
-                          return }
+                    observer(.failure(ShakerError.decoding()))
+                    return }
                 let myRecipes = cocktailList.filter { $0.myRecipe == true }
                 return observer(.success(myRecipes))
             }
@@ -141,43 +147,50 @@ class FirebaseRecipe {
         }
     }
     
-    func getWishList(completion: @escaping ([Cocktail]) -> (Void)) {
+    /// 내가 즐겨찾기해놓은 리스트를 불러온다
+    func getWishList(completion: @escaping (Result<[Cocktail], ShakerError>) -> (Void)) {
         guard let uid = uid else { return }
         ref.child("users").child(uid).child("WishList").observeSingleEvent(of: .value) { snapshot in
             guard let value = snapshot.value as? [[String: Any]],
                   let data = try? JSONSerialization.data(withJSONObject: value, options: []),
                   let cocktailList = try? JSONDecoder().decode([Cocktail].self, from: data) else {
-                      completion([Cocktail]())
-                      return }
+                completion(.failure(.decoding()))
+                return }
             let myRecipes = cocktailList.filter { $0.wishList == true }
-            completion(myRecipes)
+            completion(.success(myRecipes))
         }
     }
     
-    func getYoutubeContents(completion: @escaping ([YouTubeVideo]) -> (Void)) {
+    /// 유튜브 추천 영상 리스트를 받아온다
+    func getYoutubeContents(completion: @escaping (Result<[YouTubeVideo], ShakerError>) -> (Void)) {
         ref.child("Youtube").observeSingleEvent(of: .value) { snapshot in
             guard let value = snapshot.value as? [[String: Any]],
                   let data = try? JSONSerialization.data(withJSONObject: value, options: []),
                   let youTubeVideoList = try? JSONDecoder().decode([YouTubeVideo].self, from: data) else {
-                      completion([YouTubeVideo]())
-                      return }
-            completion(youTubeVideoList)
+                completion(.failure(.decoding()))
+                return }
+            completion(.success(youTubeVideoList))
         }
     }
     
-    func getCocktailLikeData(completion: @escaping ([String:[String: Bool]]) -> (Void)) {
+    /// 칵테일들의 좋아요 데이터를 받아온다
+    func getCocktailLikeData(completion: @escaping (Result<[String:[String: Bool]], ShakerError>) -> (Void)) {
         Database.database().reference().child("CocktailLikeData").observe( .value) { snapshot in
-            guard let value = snapshot.value as? [String:[String: Bool]] else { return }
-            completion(value)
+            guard let value = snapshot.value as? [String:[String: Bool]] else {
+                completion(.failure(.firebase("칵테일의 좋아요를 불러오는데 실패하였습니다")))
+                return
+            }
+            completion(.success(value))
         }
     }
     
-    func getSingleCocktialData(cocktail: Cocktail, completion: @escaping ([String: Bool]) -> (Void)) {
+    /// 하나의 칵테일의 좋아요 데이터를 받아온다
+    func getSingleCocktialData(cocktail: Cocktail, completion: @escaping (Result<[String: Bool], ShakerError>) -> (Void)) {
         Database.database().reference().child("CocktailLikeData").child(cocktail.name).observeSingleEvent(of: .value) { snapshot in
             guard let value = snapshot.value as? [String: Bool] else {
-                completion([:])
+                completion(.failure(.firebase("칵테일의 좋아요를 불러오는데 실패하였습니다")))
                 return  }
-            completion(value)
+            completion(.success(value))
         }
     }
     
@@ -189,7 +202,7 @@ class FirebaseRecipe {
             return cocktailList.filter { $0.value == false }.count
         }
     }
-    
+    /// 좋아요 리스트를 업로드 한다
     func uploadWishList() {
         guard let data = try? JSONEncoder().encode(FirebaseRecipe.shared.wishList),
               let jsonData = try? JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]],
@@ -197,6 +210,7 @@ class FirebaseRecipe {
         ref.child("users").child(uid).child("WishList").setValue(jsonData)
     }
     
+    /// 나의 레시피를 업로드 한다
     func uploadMyRecipe() {
         guard let data = try? JSONEncoder().encode(FirebaseRecipe.shared.myRecipe),
               let jsonData = try? JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]],
@@ -204,6 +218,11 @@ class FirebaseRecipe {
         ref.child("users").child(uid).child("MyRecipes").setValue(jsonData)
     }
     
+    /**
+     전체 레시피를 업로드 한다
+     
+     - 유저가 사용할일 없으며 내가 만든 레시피를 업데이트 할때 사용한다
+     */
     func uploadWholeRecipe() {
         let cocktailList = getJSONRecipe()
         guard let data = try? JSONEncoder().encode(cocktailList) else { return }
@@ -211,25 +230,30 @@ class FirebaseRecipe {
         Database.database().reference().child("CocktailRecipes").setValue(jsonData)
     }
     
+    /// 좋아요를 추가한다
     func addLike(cocktail: Cocktail) {
         guard let uid = uid else { return }
         Database.database().reference().child("CocktailLikeData").child(cocktail.name).child(uid).setValue(true)
     }
     
+    
     func uploadId(cocktail: Cocktail) {
         Database.database().reference().child("CocktailLikeData").child(cocktail.name).child("id").setValue(cocktail.name)
     }
     
+    /// 싫어요를 추가한다
     func addDislike(cocktail: Cocktail) {
         guard let uid = uid else { return }
         Database.database().reference().child("CocktailLikeData").child(cocktail.name).child(uid).setValue(false)
     }
-    
-    func deleteLike(cocktail: Cocktail) {
+    /// 좋아요를 제거한다
+    func deleteFavor(cocktail: Cocktail) {
         guard let uid = uid else { return }
         Database.database().reference().child("CocktailLikeData").child(cocktail.name).child(uid).setValue(nil)
     }
     
+    /// Plist로 부터 JSon파일을 반환해주는 함수, 기존에 Plist에 담겨있던 레시피를 변환 하기위하여 사용했었다.
+    /// 현재는 사용처 없음
     func getJSONRecipe() -> [Cocktail] {
         guard let bundleURL = Bundle.main.url(forResource: "CocktailData", withExtension: "json"),
               let cocktailData = FileManager.default.contents(atPath: bundleURL.path) else { return [] }
@@ -244,6 +268,7 @@ class FirebaseRecipe {
         }
     }
     
+    /// 유튜브 json파일을 업로드 하기위해 사용했었던 함수, 현재는 사용처가 없다
     func uploadyoutube() {
         guard let data = try? JSONEncoder().encode([YouTubeVideo(videoName: "firstName", videoCode: "HzxdVaKaPyA", owner: .drinkLecture)]),
               let jsonData = try? JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] else { return }

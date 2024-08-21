@@ -410,7 +410,7 @@ final class CocktailDetailViewController: ViewController {
                       self?.pleaseLoginAlert()
                       return }
             if self.iLike == true {
-                FirebaseRecipe.shared.deleteLike(cocktail: self.cocktailData)
+                FirebaseRecipe.shared.deleteFavor(cocktail: self.cocktailData)
                 FirebaseRecipe.shared.getSingleCocktialData(cocktail: self.cocktailData) { data in
                     self.likeData = data
                 }
@@ -430,7 +430,7 @@ final class CocktailDetailViewController: ViewController {
                       self?.pleaseLoginAlert()
                       return }
             if self.iLike == false {
-                FirebaseRecipe.shared.deleteLike(cocktail: self.cocktailData)
+                FirebaseRecipe.shared.deleteFavor(cocktail: self.cocktailData)
                 FirebaseRecipe.shared.getSingleCocktialData(cocktail: self.cocktailData) { data in
                     self.likeData = data
                 }
