@@ -28,11 +28,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
         
         FirebaseRecipe.shared.getRecipe { data in
-            FirebaseRecipe.shared.recipe = data
+            FirebaseRecipe.shared.recipe = (try? data.get()) ?? []
         }
         
         FirebaseRecipe.shared.getCocktailLikeData { data in
-            FirebaseRecipe.shared.cocktailLikeList = data
+            FirebaseRecipe.shared.cocktailLikeList = (try? data.get()) ?? [:]
         }
         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
         UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { granted, error in

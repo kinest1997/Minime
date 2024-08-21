@@ -16,7 +16,7 @@ final class AddRecipeCell: UITableViewCell {
             $0.bottom.top.equalToSuperview()
             $0.width.equalTo(30)
         }
-        contentView.backgroundColor = .splitLineGray
+        contentView.backgroundColor = UIColor.splitLineGray
         numberLabel.textColor = .mainGray
         numberLabel.textAlignment = .center
         explainTextField.textColor = .mainGray

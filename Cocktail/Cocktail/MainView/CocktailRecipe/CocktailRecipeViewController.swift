@@ -61,16 +61,18 @@ final class CocktailRecipeViewController: ViewController {
         navigationItem.leftBarButtonItem = leftarrangeButton
         
         FirebaseRecipe.shared.getCocktailLikeData {[weak self] data in
-            self?.likeData = data
-            self?.stopLoading()
-            self?.mainTableView.reloadData()
+            self?.likeData = (try? data.get()) ?? [:]
+            DispatchQueue.main.async {
+                self?.stopLoading()
+                self?.mainTableView.reloadData()
+            }
         }
         
         FirebaseRecipe.shared.getMyRecipe {[weak self] recipes in
             guard let self = self else {
                 return
             }
-            self.unTouchableRecipe = FirebaseRecipe.shared.recipe + recipes
+            self.unTouchableRecipe = FirebaseRecipe.shared.recipe + ((try? recipes.get()) ?? [])
             self.originRecipe = self.unTouchableRecipe
             self.filteredRecipe = self.originRecipe
             self.unTouchableRecipe.sort { $0.name < $1.name }
@@ -87,7 +89,7 @@ final class CocktailRecipeViewController: ViewController {
             guard let self = self else {
                 return
             }
-            self.unTouchableRecipe = FirebaseRecipe.shared.recipe + recipes
+            self.unTouchableRecipe = FirebaseRecipe.shared.recipe + ((try? recipes.get()) ?? [])
             self.stopLoading()
             self.unTouchableRecipe.sort { $0.name < $1.name }
             self.mainTableView.reloadData()

@@ -16,11 +16,11 @@ extension UIColor {
         }
     }
     
-    static var mainOrange: UIColor {
-        get {
-            return UIColor(named: "shaker")!
-        }
-    }
+//    static var mainOrange: UIColor {
+//        get {
+//            return UIColor(named: "shaker")!
+//        }
+//    }
     
     static var borderGray: UIColor {
         get {
@@ -28,11 +28,11 @@ extension UIColor {
         }
     }
     
-    static var splitLineGray: UIColor {
-        get {
-            return UIColor(named: "splitLineGray")!
-        }
-    }
+//    static var splitLineGray: UIColor {
+//        get {
+//            return UIColor(named: "splitLineGray")!
+//        }
+//    }
     
     static var tappedOrange: UIColor {
         get {

@@ -56,7 +56,7 @@ final class MainViewController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tabBar.tintColor = .mainOrange
+        tabBar.tintColor = UIColor.mainOrange
         self.tabBar.barStyle = .default
         self.tabBar.backgroundColor = .white
         todayCocktailCollectionViewController.tabBarItem = tabBarItems[.today]

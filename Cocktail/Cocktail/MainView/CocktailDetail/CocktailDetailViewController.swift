@@ -120,7 +120,7 @@ final class CocktailDetailViewController: ViewController {
         layout()
         addBarButton()
         FirebaseRecipe.shared.getSingleCocktialData(cocktail: cocktailData) {[weak self] data in
-            self?.likeData = data
+            self?.likeData = ((try? data.get()) ?? [:])
         }
     }
     
@@ -412,14 +412,14 @@ final class CocktailDetailViewController: ViewController {
             if self.iLike == true {
                 FirebaseRecipe.shared.deleteFavor(cocktail: self.cocktailData)
                 FirebaseRecipe.shared.getSingleCocktialData(cocktail: self.cocktailData) { data in
-                    self.likeData = data
+                    self.likeData = (try? data.get()) ?? [:]
                 }
                 self.iLike = nil
             } else {
                 self.popUpView.animating(text: "I like it!".localized)
                 FirebaseRecipe.shared.addLike(cocktail: self.cocktailData)
                 FirebaseRecipe.shared.getSingleCocktialData(cocktail: self.cocktailData) { data in
-                    self.likeData = data
+                    self.likeData = (try? data.get()) ?? [:]
                 }
             }
         }), for: .touchUpInside)
@@ -432,14 +432,14 @@ final class CocktailDetailViewController: ViewController {
             if self.iLike == false {
                 FirebaseRecipe.shared.deleteFavor(cocktail: self.cocktailData)
                 FirebaseRecipe.shared.getSingleCocktialData(cocktail: self.cocktailData) { data in
-                    self.likeData = data
+                    self.likeData = (try? data.get()) ?? [:]
                 }
                 self.iLike = nil
             } else {
                 self.popUpView.animating(text: "I don't like it...".localized)
                 FirebaseRecipe.shared.addDislike(cocktail: self.cocktailData)
                 FirebaseRecipe.shared.getSingleCocktialData(cocktail: self.cocktailData) { data in
-                    self.likeData = data
+                    self.likeData = (try? data.get()) ?? [:]
                 }
             }
         }), for: .touchUpInside)

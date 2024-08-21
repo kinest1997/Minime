@@ -6,7 +6,7 @@ final class LoadingView: UIView {
     
     let explainLabel = UILabel()
     
-    let animationView = AnimationView(name: "LoadingAnimation")
+    let animationView = LottieAnimationView(name: "LoadingAnimation")
     
     override func layoutSubviews() {
         super.layoutSubviews()
