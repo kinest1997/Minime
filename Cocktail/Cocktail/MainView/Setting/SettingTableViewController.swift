@@ -99,7 +99,7 @@ extension SettingTableViewController {
             case 0:
                 requestAppStoreReview()
             case 1:
-                setlinkAction(appURL: "itms-beta://", webURL: "")
+                setlinkAction(appURL: "items-beta://", webURL: "")
             default:
                 return
             }
@@ -172,14 +172,13 @@ extension SettingTableViewController {
         }
     }
     
-    private func setlinkAction(appURL: String, webURL: String){
+    private func setlinkAction(appURL: String, webURL: String) {
         let appURL = URL(string: appURL)!
         let application = UIApplication.shared
         
         if application.canOpenURL(appURL) {
             application.open(appURL)
-        } else {
-            let webURL = URL(string: webURL)!
+        } else if let webURL = URL(string: webURL) {
             application.open(webURL)
         }
     }
